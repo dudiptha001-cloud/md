@@ -8,14 +8,43 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Try to import Streamlit for secrets access
+try:
+    import streamlit as st
+    HAS_STREAMLIT = True
+except ImportError:
+    HAS_STREAMLIT = False
+
+
+def get_secret(key: str, default: str = "") -> str:
+    """
+    Get a secret from Streamlit secrets or environment variables
+    
+    Args:
+        key: Secret/environment variable name
+        default: Default value if not found
+        
+    Returns:
+        Secret value or default
+    """
+    # Try Streamlit secrets first (for production on Streamlit Cloud)
+    if HAS_STREAMLIT:
+        try:
+            return st.secrets.get(key, os.getenv(key, default)).strip()
+        except:
+            pass
+    
+    # Fall back to environment variables
+    return os.getenv(key, default).strip()
+
 
 class Settings:
     """Application settings"""
 
     # API Configuration
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-    AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "").strip()
-    AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "").strip()
+    OPENAI_API_KEY = get_secret("OPENAI_API_KEY", "")
+    AZURE_OPENAI_API_KEY = get_secret("AZURE_OPENAI_API_KEY", "")
+    AZURE_OPENAI_ENDPOINT = get_secret("AZURE_OPENAI_ENDPOINT", "")
     AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
 
     # Model Configuration
@@ -36,7 +65,7 @@ class Settings:
     # Application Configuration
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
     MAX_HISTORY = 10
-    DEMO_MODE = os.getenv("DEMO_MODE", "False").lower() == "true"
+    DEMO_MODE = get_secret("DEMO_MODE", "False").lower() == "true"
 
     @staticmethod
     def has_valid_api_key():

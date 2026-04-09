@@ -30,10 +30,10 @@ class SupportAgent:
         
         # Auto-detect if not specified
         if use_azure is None:
-            use_azure = bool(Settings.AZURE_OPENAI_API_KEY)
+            use_azure = bool(Settings.get_azure_api_key())
         
         self.use_azure = use_azure
-        self.demo_mode = Settings.DEMO_MODE
+        self.demo_mode = Settings.get_demo_mode()
         
         # In demo mode, skip vectorstore and LLM initialization
         if self.demo_mode:
@@ -50,24 +50,28 @@ class SupportAgent:
     def _get_llm(self):
         """Initialize LLM"""
         # Check if Azure OpenAI config is valid
+        azure_key = Settings.get_azure_api_key()
+        azure_endpoint = Settings.get_azure_endpoint()
+        
         has_valid_azure = (
-            Settings.AZURE_OPENAI_API_KEY 
-            and not Settings.AZURE_OPENAI_API_KEY.startswith("your_")
-            and Settings.AZURE_OPENAI_ENDPOINT
-            and not Settings.AZURE_OPENAI_ENDPOINT.startswith("your_")
+            azure_key 
+            and not azure_key.startswith("your_")
+            and azure_endpoint
+            and not azure_endpoint.startswith("your_")
         )
         
         if has_valid_azure:
             return AzureChatOpenAI(
-                api_key=Settings.AZURE_OPENAI_API_KEY,
-                azure_endpoint=Settings.AZURE_OPENAI_ENDPOINT,
+                api_key=azure_key,
+                azure_endpoint=azure_endpoint,
                 api_version=Settings.AZURE_OPENAI_API_VERSION,
                 model=Settings.MODEL_NAME,
                 temperature=Settings.TEMPERATURE,
             )
         else:
+            openai_key = Settings.get_openai_api_key()
             return ChatOpenAI(
-                api_key=Settings.OPENAI_API_KEY,
+                api_key=openai_key,
                 model=Settings.MODEL_NAME,
                 temperature=Settings.TEMPERATURE,
             )

@@ -14,23 +14,27 @@ def get_embeddings():
         OpenAIEmbeddings or AzureOpenAIEmbeddings
     """
     # Check if Azure OpenAI config is valid
+    azure_key = Settings.get_azure_api_key()
+    azure_endpoint = Settings.get_azure_endpoint()
+    
     has_valid_azure = (
-        Settings.AZURE_OPENAI_API_KEY 
-        and not Settings.AZURE_OPENAI_API_KEY.startswith("your_")
-        and Settings.AZURE_OPENAI_ENDPOINT
-        and not Settings.AZURE_OPENAI_ENDPOINT.startswith("your_")
+        azure_key 
+        and not azure_key.startswith("your_")
+        and azure_endpoint
+        and not azure_endpoint.startswith("your_")
     )
     
     if has_valid_azure:
         return AzureOpenAIEmbeddings(
-            api_key=Settings.AZURE_OPENAI_API_KEY,
-            azure_endpoint=Settings.AZURE_OPENAI_ENDPOINT,
+            api_key=azure_key,
+            azure_endpoint=azure_endpoint,
             api_version=Settings.AZURE_OPENAI_API_VERSION,
             model=Settings.EMBEDDING_MODEL,
         )
     else:
+        openai_key = Settings.get_openai_api_key()
         return OpenAIEmbeddings(
-            api_key=Settings.OPENAI_API_KEY,
+            api_key=openai_key,
             model=Settings.EMBEDDING_MODEL,
         )
 

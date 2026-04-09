@@ -46,7 +46,7 @@ def initialize_session_state():
         st.session_state.show_sources = True
     
     # In demo mode, try to initialize agent immediately (it won't call API)
-    if Settings.DEMO_MODE and st.session_state.agent is None and not st.session_state.agent_init_attempted:
+    if Settings.get_demo_mode() and st.session_state.agent is None and not st.session_state.agent_init_attempted:
         try:
             st.session_state.agent = SupportAgent()
             st.session_state.agent_init_attempted = True
@@ -59,7 +59,7 @@ def initialize_session_state():
 def get_agent():
     """Lazy initialize and return the agent"""
     # If in demo mode, don't try to load real agent
-    if Settings.DEMO_MODE:
+    if Settings.get_demo_mode():
         if st.session_state.agent is None:
             st.session_state.agent = SupportAgent()
         return st.session_state.agent
@@ -89,7 +89,7 @@ def main():
     
     # Check API configuration
     api_key_configured = Settings.has_valid_api_key()
-    demo_mode = Settings.DEMO_MODE
+    demo_mode = Settings.get_demo_mode()
     
     # Header
     st.title("Customer Support Agent")

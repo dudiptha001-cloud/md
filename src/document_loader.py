@@ -10,6 +10,7 @@ from typing import List
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
 
 from config.settings import Settings
 from src.embeddings import get_embeddings
@@ -121,23 +122,23 @@ class DocumentProcessor:
     def _create_sample_docs():
         """Create sample support documents"""
         return [
-            {
-                "page_content": "Password Reset: To reset your password, go to the login page and click 'Forgot Password'. "
-                               "Enter your email address and follow the instructions sent to your inbox. "
-                               "The reset link is valid for 24 hours.",
-                "metadata": {"source": "sample"}
-            },
-            {
-                "page_content": "Account Settings: You can update your profile information, email, and preferences in the Account Settings page. "
-                               "Click on your profile icon in the top right corner and select Settings.",
-                "metadata": {"source": "sample"}
-            },
-            {
-                "page_content": "Billing and Subscription: Your current subscription plan can be managed in Billing section. "
-                               "You can upgrade, downgrade, or cancel your subscription anytime. "
-                               "Changes take effect at the end of the current billing cycle.",
-                "metadata": {"source": "sample"}
-            },
+            Document(
+                page_content="Password Reset: To reset your password, go to the login page and click 'Forgot Password'. "
+                           "Enter your email address and follow the instructions sent to your inbox. "
+                           "The reset link is valid for 24 hours.",
+                metadata={"source": "sample"}
+            ),
+            Document(
+                page_content="Account Settings: You can update your profile information, email, and preferences in the Account Settings page. "
+                           "Click on your profile icon in the top right corner and select Settings.",
+                metadata={"source": "sample"}
+            ),
+            Document(
+                page_content="Billing and Subscription: Your current subscription plan can be managed in Billing section. "
+                           "You can upgrade, downgrade, or cancel your subscription anytime. "
+                           "Changes take effect at the end of the current billing cycle.",
+                metadata={"source": "sample"}
+            ),
         ]
 
 
